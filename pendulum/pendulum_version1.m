@@ -63,6 +63,9 @@ CC = eye(n_outputs)
 %CC = [1 0]
 %xdesired
 xd = 1;
+%differential
+Ts = 1/200;
+omega_c = 2*2*pi;
 
 
 
