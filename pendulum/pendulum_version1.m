@@ -27,7 +27,7 @@ D = [0
 %Q = [0.25 0 0 0;0 4 0 0;0 0 0 0;0 0 0 0];
 %R = 0.003;
 %more stable alpha (row 2) than x (row 1)
-Q = [0.25 0 0 0;0 400 0 0;0 0 0 0;0 0 0 0];
+Q = [0.25 0 0 0;0 4 0 0;0 0 0 0;0 0 0 0];
 %smaller R leads to quicker rection
 R = 0.003;
 %stability and controlability analysis
