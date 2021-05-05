@@ -1,0 +1,78 @@
+#include <students/control/Attitude.hpp>
+
+Attitude::State Attitude::codegenNextStateEstimate(State stateEstimate,
+                                                   ControlSignal ctrl,
+                                                   Measurement meas) {
+    // Nextstate = A * stateEstimate + L * (C * StateEstimate - meas) + B * crtl
+    
+    // C is een identiteitsmatrix 
+    // 1) quaternion product: C * stateEstimate - meas: stateEstimateMinusMeas
+    State stateEstMinusMeas = State(stateEstimate.q,stateEstimate.w,
+                                                        stateEstimate.n);
+    stateEstMinusMeas.q = stateEstimate.q - meas.q;
+    stateEstMinusMeas.w = stateEstimate.w - meas.w;
+    // n component niet nodig want C is daar overal 0
+
+    // 2) A * stateEstimate
+    State ATimesStateEstimate = State();
+    // #codegen_ATimesStateEstimate
+    
+    
+    
+    // 3) L * stateEstMinusMeas
+    State LTimesMinus = State();
+    // #codegen_LtimesMinusMeas
+
+    // 4) B * ctrl
+    State BTimesControl = State();
+    // #codegen_BTimesControl
+
+    // 5) Sumation of components
+    State nextState = State();
+    nextState.q = ATimesStateEstimate.q + LTimesMinus.q + BTimesControl.q;
+    nextState.w = ATimesStateEstimate.w + LTimesMinus.w + BTimesControl.w;
+    nextState.n = ATimesStateEstimate.n + LTimesMinus.n + BTimesControl.n;
+
+    return {nextState};
+}
+
+Attitude::ControlSignal Attitude::codegenControlSignal(State stateEstimate,
+                                                       Integral integralWindup,
+                                                       Reference ref) {
+
+    // [x_e u_e] = G * ref
+    // ctrl = u_e + K * (stateEstimate - x_e)
+
+    // 1) [x_e u_e] = G * ref
+    State StateEqui = State();
+    ControlSignal ControlEqui = ControlSignal();
+    // #codegen_GTimesRef
+
+
+    // 2)  stateEstimate - x_e
+    State StateEstMinusStateEqui = State();
+    StateEstMinusStateEqui.q = stateEstimate.q - stateEqui.q;
+    StateEstMinusStateEqui.w = stateEstimate.w - stateEqui.w;
+    StateEstMinusStateEqui.n = stateEstimate.n - stateEqui.n;
+
+    // 3) K * StateEstMinusStateEqui
+    ControlSignal KTimesState = ControlSignal();
+    // #codegen_KTimesState
+
+
+    // 4) u_e + KTimesState
+    ControlSignal Control = ControlSignal();
+    Control = ControlEqui + KTimesState;
+
+    return {Control};
+}
+
+Attitude::Integral Attitude::codegenIntegralWindup(State stateEstimate,
+                                                   Integral integralWindup,
+                                                   Reference ref) {
+    // TODO
+    (void) stateEstimate;
+    (void) integralWindup;
+    (void) ref;
+    return {};
+}
