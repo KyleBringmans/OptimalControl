@@ -57,12 +57,12 @@ Q2 = q2*eye(n_states);
 %R  = eye(n_inputs);
 %K = lqr(A,B,Q1,R);
 K2 = lqr(A,B,Q2,R);
-CC = eye(n_outputs)
+CC = [0.456/4.41 0; 0 90/6.328]
 %sys1 = ss(A-B2*K1,B1(:,1),[C2;C1;-D1*K1;-K1],0);
 
 %CC = [1 0]
 %xdesired
-xd = 1;
+xd = 2;
 %differential
 Ts = 1/200;
 omega_c = 2*2*pi;
