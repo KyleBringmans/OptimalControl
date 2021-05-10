@@ -28,3 +28,10 @@ A(7,10) = 1;A(8,11) = 1;A(9,12) = 1;%A(10,11) = (Iyy-Izz)/Ixx;A(10,12) = (Iyy-Iz
 %A(11,10) = (Izz-Ixx)/Iyy;A(11,12) = (Izz-Ixx)/Iyy;A(12,10) = (Ixx-Iyy)/Izz;
 %A(12,11) = (Ixx-Iyy)/Izz
 %comment because the omega are zero, see latex.
+
+B = zeros(12,4);
+B(6,:) = k*cm/mass;
+B(10,1) = L*k*cm/Ixx;B(10,3) = -L*k*cm/Ixx;
+B(11,2) = L*k*cm/Iyy;B(11,4) = -L*k*cm/Iyy;
+B(12,1) = b*cm/Izz;B(12,2) = -b*cm/Izz;B(12,3) = b*cm/Izz;B(12,4) = -b*cm/Izz
+
