@@ -35,3 +35,6 @@ B(10,1) = L*k*cm/Ixx;B(10,3) = -L*k*cm/Ixx;
 B(11,2) = L*k*cm/Iyy;B(11,4) = -L*k*cm/Iyy;
 B(12,1) = b*cm/Izz;B(12,2) = -b*cm/Izz;B(12,3) = b*cm/Izz;B(12,4) = -b*cm/Izz
 
+C = zeros(6,12);
+C(1,1)=1;C(2,2)=1;C(3,3)=1;C(4,7)=1;C(5,8)=1;C(6,9)=1
+
