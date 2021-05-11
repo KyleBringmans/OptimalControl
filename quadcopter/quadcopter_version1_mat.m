@@ -43,6 +43,11 @@ C(1,1)=1;C(2,2)=1;C(3,3)=1;C(4,7)=1;C(5,8)=1;C(6,9)=1;
 D = zeros(6,4);
 CC = eye(6);
 
+eig(A) 
+CO = ctrb(A,B)
+rank(CO) % rank(CO) > length(A)
+rank(A)
+
 Q = zeros(12,12);
 Q(1,1) = 0.1;Q(2,2) = 0.1;Q(3,3) = 1000;
 Q(4,4) = 10^(-4);Q(5,5) = 10^(-4);Q(6,6) = 10^(-1);
@@ -65,9 +70,32 @@ R_i = eye(4,4)*0.1;
 K = zeros(4,6)
 K(:,1:3) = K1(:,1:3)
 K(:,4:6) = K1(:,7:9)
-NA = [zeros(6,6) C; zeros(12,6) A]
-NB = [D;B]
-lqi(sys,Q_i,R_i)
+%NA = [zeros(6,6) C; zeros(12,6) A]
+%NB = [D;B]
+AA = [A(1:3,4:6) A(1:3,10:12);A(7:9,4:6) A(7:9,10:12)]
+BB = [B(4:6,:); B(10:12,:)]
+CCC = eye(4,6)
+
+minreal(sys)
+Q = eye(18)
+N = zeros(18,4)
+R
+R = eye(4,4);
+eig([Q N;N' R])
+lqqi = lqi(sys,Q,R,N)
+sys = ss(AA,BB,CCC,zeros(4,4))
+
+
+
+%lqi(sys,Q_i,R)
+Q = eye(10,10);
+R = eye(4);
+
+%stability and controlability analysis
+eig(AA) ;
+CO = ctrb(AA,BB);
+rank(CO); % rank(CO) > length(A)
+rank(AA);
 
 
 
