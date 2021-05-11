@@ -78,6 +78,7 @@ CCC = eye(4,6)
 
 minreal(sys)
 Q = eye(18)
+%Q(15,15)
 N = zeros(18,4)
 R
 R = eye(4,4);
@@ -85,8 +86,8 @@ eig([Q N;N' R])
 lqqi = lqi(sys,Q,R,N)
 sys = ss(AA,BB,CCC,zeros(4,4))
 
-
-
+lqqi_system = zeros(4,6)
+lqqi_system(:,1:3) = lqqi(:,3:15)
 %lqi(sys,Q_i,R)
 Q = eye(10,10);
 R = eye(4);
