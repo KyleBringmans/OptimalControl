@@ -91,6 +91,7 @@ Rk = diag([2.5e-5 2.5e-5 2.5e-5 7.57e-5 7.57e-5 7.57e-5]);
 
 %%
 % Pole placement
+% Todo: pole placement for K, Nu and Nx
 
 % Get continuous poles of the system
 p_c = pole(sys_c);
