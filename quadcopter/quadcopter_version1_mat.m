@@ -61,11 +61,11 @@ C(6,9)=1;
 
 D = zeros(6,4);
 
-Q = diag([0.1 0.1 1000 10^-4 10^-4 10^-1 10 10 10 10^-1 10^-1 10^-2]);
+Q = diag([10 10 1000 10^-4 10^-4 10^-1 10 10 10 10^-1 10^-1 10^-2]);
 R = eye(4,4)*0.1;
 
-sys = ss(A,B,C,zeros(6,4));
-sys = c2d(sys,Ts,'zoh');
+sys_c = ss(A,B,C,zeros(6,4));
+sys = c2d(sys_c,Ts,'zoh');
 
 K1 = lqr(sys,Q,R);
 
@@ -79,21 +79,32 @@ N_u = N_tot(13:end,:);
 Q_i = diag([100 100 10 10 10 10 100 100 100 1 1 10 100 100 100]);
 R_i = eye(4,4)*0.001;
 
-Q = eye(18);
-R = eye(4,4);
 Ki = lqi_custom(sys,Q_i,R_i);
 
 %%
 % Signal noise covariance
-Rk = diag([2.5e-5 2.5e-5 2.5e-5 7.57e-5 7.57e-5 7.57e-5]);
+% Or just use Q from LQR? see p. 182 in course notes since B_1 = I
+% Qk = I * kalman_var
+kalman_var = 1e-4;
 % Process noise covariance
-Qk = eye(4);
-[kalmf,L,~,Mx,Z] = kalman(sys,Qk,Rk);
+Rk = diag([2.5e-5 2.5e-5 2.5e-5 7.57e-5 7.57e-5 7.57e-5]);
 
+%%
+% Pole placement
 
+% Get continuous poles of the system
+p_c = pole(sys_c);
+p_c(1) = 1e-5;
+p_c(2) = 1e-5;
+p_c(3) = 1e-5;
+% Rule of thumb
+p_c = 3*p_c;
+% Make them discrete
+p_d = exp(p_c.*Ts);
+% Place the poles (Sylvester)
+L = place(sys.A',sys.C',p_d).';
 
-
-
+sys_pp = ss(sys.A-L*sys.C, [sys.B-L*sys.D L], eye(12,12), zeros(12,10));
 
 
 
