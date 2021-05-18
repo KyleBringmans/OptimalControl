@@ -61,7 +61,7 @@ C(6,9)=1;
 
 D = zeros(6,4);
 
-Q = diag([10 10 1000 10^-4 10^-4 10^-1 10 10 10 10^-1 10^-1 10^-2]);
+Q = diag([1 1 1000 10^-4 10^-4 10^-1 10 10 10 10^-1 10^-1 10^-2]);
 R = eye(4,4)*0.1;
 
 sys_c = ss(A,B,C,zeros(6,4));
@@ -76,7 +76,7 @@ N_u = N_tot(13:end,:);
 %%
 %LQI
 
-Q_i = diag([100 100 10 10 10 10 100 100 100 1 1 10 100 100 100]);
+Q_i = diag([100 100 100 10 10 10 100 100 100 1 1 10 100 100 100]);
 R_i = eye(4,4)*0.001;
 
 Ki = lqi_custom(sys,Q_i,R_i);
@@ -85,27 +85,49 @@ Ki = lqi_custom(sys,Q_i,R_i);
 % Signal noise covariance
 % Or just use Q from LQR? see p. 182 in course notes since B_1 = I
 % Qk = I * kalman_var
-kalman_var = 1e-4;
+Qk = eye(12)*1e-4;
+Q(6,6) = 100;
 % Process noise covariance
 Rk = diag([2.5e-5 2.5e-5 2.5e-5 7.57e-5 7.57e-5 7.57e-5]);
 
 %%
-% Pole placement
-% Todo: pole placement for K, Nu and Nx
+% Pole placement (LQR controller alternative)
 
-% Get continuous poles of the system
-p_c = pole(sys_c);
-p_c(1) = 1e-5;
-p_c(2) = 1e-5;
-p_c(3) = 1e-5;
-% Rule of thumb
-p_c = 3*p_c;
+% Initial w_n = 1.8/0.5
+% Initial zeta = 0.2279 aka 4.6/(3*w_n) because we wanted t_s = 3
+
+% Peaks in controller and twisted flight paths
+% zeta_2 = .... bij taking t_s = 10
+
+% rise time of t_r => calc w_n
+t_r = 0.5;
+w_n = 1.8/t_r;
+% settling time t_s => calc zeta
+t_s = 10;
+zeta = 4.6/(t_s*w_n);
+
+tfunc = tf(w_n^2, [1 2*zeta*w_n w_n^2]);
+
+dom_poles = pole(tfunc);
+
+other_poles = 0.1*rand(10,1) + ones(10,1)*3*real(dom_poles(1));
+
+p_c = [dom_poles;other_poles];
+
 % Make them discrete
 p_d = exp(p_c.*Ts);
 % Place the poles (Sylvester)
-L = place(sys.A',sys.C',p_d).';
+K1 = place(sys.A,sys.B,p_d);
 
-sys_pp = ss(sys.A-L*sys.C, [sys.B-L*sys.D L], eye(12,12), zeros(12,10));
+%%
+% Pole placement (State estimator)
+
+%p_d = eig(sys.A-sys.B*K1); cheating
+
+p_est = p_c*3;
+p_est_d = exp(p_est.*Ts);
+L = place(sys.A',sys.C',p_est_d).';
+sys_L = ss(sys.A-L*sys.C, [sys.B-L*sys.D L], eye(12,12), zeros(12,10));
 
 
 
