@@ -75,8 +75,11 @@ N_u = N_tot(13:end,:);
 
 %%
 %LQI
-
-Q_i = diag([100 100 100 10 10 10 100 100 100 1 1 10 100 100 100]);
+%LQI z pos == 10 for pole placement, else: 100
+% Increasing integral gains (last 3 params) by too much (>=100)
+% creates small instantaneous oscillations on z-axis
+%Q_i = diag([100 100 100 10 10 10 100 100 100 1 1 1 100 100 100]);
+Q_i = diag([15 15 50 10 10 1 80 80 100 1 1 1 150 150 100]*15);
 R_i = eye(4,4)*0.001;
 
 Ki = lqi_custom(sys,Q_i,R_i);
@@ -100,10 +103,10 @@ Rk = diag([2.5e-5 2.5e-5 2.5e-5 7.57e-5 7.57e-5 7.57e-5]);
 % zeta_2 = .... bij taking t_s = 10
 
 % rise time of t_r => calc w_n
-t_r = 0.5;
+t_r = 0.6;
 w_n = 1.8/t_r;
 % settling time t_s => calc zeta
-t_s = 10;
+t_s = 12;
 zeta = 4.6/(t_s*w_n);
 
 tfunc = tf(w_n^2, [1 2*zeta*w_n w_n^2]);
@@ -124,10 +127,10 @@ K1 = place(sys.A,sys.B,p_d);
 
 %p_d = eig(sys.A-sys.B*K1); cheating
 
-p_est = p_c*3;
+p_est = p_c*5;
 p_est_d = exp(p_est.*Ts);
 L = place(sys.A',sys.C',p_est_d).';
-sys_L = ss(sys.A-L*sys.C, [sys.B-L*sys.D L], eye(12,12), zeros(12,10));
+sys_L = ss(sys.A-L*sys.C, [sys.B L], eye(12,12), zeros(12,10));
 
 
 
