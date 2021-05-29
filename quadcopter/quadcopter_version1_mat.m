@@ -60,10 +60,43 @@ C(5,8)=1;
 C(6,9)=1;
 
 D = zeros(6,4);
+%%
+%%discretization
+eig(A)
+% stability and controlability analysis
+CO = ctrb(A,B);
+rank(CO)
+% rank(CO) % rank(CO) > length(A)
+ %rank(A)
+% observability
+OO=obsv(A,C);
+ rank(OO) % < length(A) ?
+ length(A)
+% [V,d]=eig(A);
+% minimal
+%sys=ss(A,B,C,D,-1)
+%minreal(sys)
 
-Q = diag([1 1 1000 10^-4 10^-4 10^-1 10 10 10 10^-1 10^-1 10^-2]);
+
+
+
+%%
+%Q R,...
+
+
+
+%Q = diag([1 1 4 10^-4 10^-4 10^-4 20 20 2 10^-1 10^-1 10^-2]);
+%R = eye(4,4)*0.1;
+
+%Q&R for pure LQR zonder kalman
+%Q = diag([32 32 1500 3 3 4 100 100 1 10^-1 10^-1 10^-2]);%=>1.457
+%R = eye(4,4)*0.1;
+%Q&R for lqr + lqi zonder kalman
+%Q = diag([32 32 150 3 3 4 100 100 1 10^-1 10^-1 10^-2]);
+%R = eye(4,4)*0.1;
+%for lqg
+Q = diag([122 122 150 25 25 1 100 100 1 10^-1 10^-1 10^-2]);
 R = eye(4,4)*0.1;
-
 sys_c = ss(A,B,C,zeros(6,4));
 sys = c2d(sys_c,Ts,'zoh');
 
@@ -78,8 +111,16 @@ N_u = N_tot(13:end,:);
 %LQI z pos == 10 for pole placement, else: 100
 % Increasing integral gains (last 3 params) by too much (>=100)
 % creates small instantaneous oscillations on z-axis
+%earlier
 %Q_i = diag([100 100 100 10 10 10 100 100 100 1 1 1 100 100 100]);
-Q_i = diag([15 15 50 10 10 1 80 80 100 1 1 1 150 150 100]*15);
+%Q_i = diag([5 5 8 3 3 3 80 80 100 1 1 1 150 150 100]*15);
+%R_i = eye(4,4)*0.001;
+%new better, that combined with Q = diag([32 32 150 3 3 4 100 100 1 10^-1 10^-1 10^-2]);
+%produces a time of 1.707 (for massa). but without kalman
+%Q_i = diag([50 50 15 2 2 4 100 100 100 10^-1 10^-1 10^-2 290 290 320]);
+%R_i = eye(4,4)*0.001;
+%with kalman
+Q_i = diag([30 30 15 1 1 1 100 100 100 10^-1 10^-1 10^-2 380 380 350]);
 R_i = eye(4,4)*0.001;
 
 Ki = lqi_custom(sys,Q_i,R_i);
@@ -88,8 +129,12 @@ Ki = lqi_custom(sys,Q_i,R_i);
 % Signal noise covariance
 % Or just use Q from LQR? see p. 182 in course notes since B_1 = I
 % Qk = I * kalman_var
-Qk = eye(12)*1e-4;
-Q(6,6) = 100;
+%Qk = eye(12)*1e-4;
+%Qk = diag([1 1 1 1 1 1 1 1 1 1 1 1])*1e-4;
+%Qk = diag([0.5 0.5 0.5 10^-4 10^-4 10^-4 10 10 10 10^-1 10^-1 10^-2]); 2.2
+%shit symmetry....
+Qk = diag([100 100 0.001 200 200 10^-1 55 55 35 10^-1 10^-1 10^-1]*10);
+%Q(6,6) = 100;
 % Process noise covariance
 Rk = diag([2.5e-5 2.5e-5 2.5e-5 7.57e-5 7.57e-5 7.57e-5]);
 
@@ -120,7 +165,7 @@ p_c = [dom_poles;other_poles];
 % Make them discrete
 p_d = exp(p_c.*Ts);
 % Place the poles (Sylvester)
-K1 = place(sys.A,sys.B,p_d);
+%K1 = place(sys.A,sys.B,p_d);
 
 %%
 % Pole placement (State estimator)
