@@ -61,11 +61,13 @@ omega_c = 0.7*pi;
 
 % more stable alpha (row 2) than x (row 1)
 Q = [0.5 0 0 0;0 15 0 0;0 0 0 0;0 0 0 0];
+Q1 = [0.5 0 0 0;0 15 0 0;0 0 0 0;0 0 0 0];
 % smaller R leads to quicker rection
-R = 0.003;
+%R = 0.003;
+R = 0.005;
 
 sys =ss(A,B,C,D,Ts);
-K = lqr(A,B,Q,R);
+K = lqr(A,B,Q1,R);
 %%
 % New (simpler) model for question 2
 
